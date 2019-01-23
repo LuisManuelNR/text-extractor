@@ -1,0 +1,28 @@
+{
+  "name": "text-extractor",
+  "version": "1.0.0",
+  "description": "extract text with command line in any node.js project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuisManuelNR/text-extractor.git"
+  },
+  "keywords": [
+    "text",
+    "extract",
+    "node",
+    "json"
+  ],
+  "author": "Luis Manuel Noguerol Ramírez (https://chazycub.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LuisManuelNR/text-extractor/issues"
+  },
+  "homepage": "https://github.com/LuisManuelNR/text-extractor#readme",
+  "bin": {
+    "chazyext": "./index.js"
+  }
+}

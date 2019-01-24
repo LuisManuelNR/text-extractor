@@ -14,29 +14,53 @@ module.exports = {
     }
   },
 
-  extractFromFile (file, target, replaceContent) {
+  extractFromFile (file) {
     fs.readFile(file, 'utf8', (err, contents) => {
       if (err) throw err
       const filter = /\$\$.*?\$\$/g
       const match = contents.match(filter)
       const result = {}
-      let rewritedContent = !replaceContent || `import t from "${target}" \n ${contents}`
-      match.map(v => {
-        const token = this.generateToken()
-        result[token] = v.substr(2, v.length - 4)
-        rewritedContent = !replaceContent || rewritedContent.replace(`'${v}'`, `t.${token}`)
-      })
-      fs.writeFile(target + '.json', JSON.stringify(result), err => {
-        if (err) throw err
-        console.log('succesfull generated file')
-      })
-      if (replaceContent) {
-        fs.writeFile(file, rewritedContent, err => {
-          if (err) throw err
-          console.log('succesfull replaced file')
+      if (match) {
+        match.map(v => {
+          const token = this.generateToken()
+          result[token] = v.substr(2, v.length - 4)
         })
       }
+      console.log('3')
+      return result
     })
+  },
+
+  extractFromDir (dir) {
+    const fileList = this.walkSync(dir)
+    let result = {}
+    fileList.map(f => {
+      result = Object.assign(this.extractFromFile('./' + f), result)
+    })
+    return result
+  },
+
+  replaceContent (file, content) {
+    fs.writeFile(file, content, err => {
+      if (err) throw err
+      console.log('succesfull replaced file')
+    })
+  },
+
+  saveJson (fileName, content) {
+    fs.writeFile(fileName + '.json', JSON.stringify(content), err => {
+      if (err) throw err
+      console.log('succesfull generated file')
+    })
+  },
+
+  walkSync (dir, filelist = []) {
+    fs.readdirSync(dir).map(file => {
+      filelist = fs.statSync(path.join(dir, file)).isDirectory()
+        ? this.walkSync(path.join(dir, file), filelist)
+        : filelist.concat(path.join(dir, file))
+    })
+    return filelist
   },
 
   generateToken () {

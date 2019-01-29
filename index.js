@@ -4,12 +4,18 @@ const file = require('./src/file')
 
 const run = async () => {
   const questionResponse = await inquirer.askQuestions()
+  let result
   if (questionResponse.dirOrFile === 'dir') {
-    console.log(file.extractFromDir(questionResponse.dirOrFilePath))
+    result = await file.extractFromDir(questionResponse.dirOrFilePath, questionResponse.replace)
   } else {
-    file.extractFromFile(questionResponse.dirOrFilePath)
+    result = await file.extractFromFile(questionResponse.dirOrFilePath, questionResponse.replace)
   }
-  // file.extractFromFile('./test/pcp-holder.component.ts', './source.json')
+  if (result) {
+    file.saveJson(questionResponse.targetPath, result)
+    console.log('succesfull generated json file')
+  } else {
+    console.log('No results were found')
+  }
 }
 
 /*

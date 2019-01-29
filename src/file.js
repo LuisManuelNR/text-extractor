@@ -14,30 +14,36 @@ module.exports = {
     }
   },
 
-  extractFromFile (file) {
-    fs.readFile(file, 'utf8', (err, contents) => {
-      if (err) throw err
-      const filter = /\$\$.*?\$\$/g
-      const match = contents.match(filter)
-      const result = {}
-      if (match) {
-        match.map(v => {
-          const token = this.generateToken()
-          result[token] = v.substr(2, v.length - 4)
-        })
-      }
-      console.log('3')
-      return result
+  extractFromFile (file, wantReplace) {
+    return new Promise(resolve => {
+      fs.readFile(file, 'utf8', (err, contents) => {
+        if (err) throw err
+        const filter = /\$\$.*?\$\$/g
+        const match = contents.match(filter)
+        const result = {}
+        let rewritedContent = !wantReplace || `import t from "./source" \n ${contents}`
+        if (match) {
+          match.map(v => {
+            const token = this.generateToken()
+            result[token] = v.substr(2, v.length - 4)
+            rewritedContent = !wantReplace || rewritedContent.replace(`'${v}'`, `t.${token}`)
+          })
+          if (wantReplace) this.replaceContent(file, rewritedContent)
+        }
+        resolve(result)
+      })
     })
   },
 
-  extractFromDir (dir) {
-    const fileList = this.walkSync(dir)
-    let result = {}
-    fileList.map(f => {
-      result = Object.assign(this.extractFromFile('./' + f), result)
+  extractFromDir (dir, wantReplace) {
+    return new Promise(resolve => {
+      const fileList = this.walkSync(dir)
+      let result = {}
+      fileList.map(async (f, i) => {
+        result = Object.assign(await this.extractFromFile(f, wantReplace), result)
+        if (i === fileList.length - 1) resolve(result)
+      })
     })
-    return result
   },
 
   replaceContent (file, content) {
@@ -50,7 +56,6 @@ module.exports = {
   saveJson (fileName, content) {
     fs.writeFile(fileName + '.json', JSON.stringify(content), err => {
       if (err) throw err
-      console.log('succesfull generated file')
     })
   },
 

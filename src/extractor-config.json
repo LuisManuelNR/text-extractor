@@ -1,0 +1,7 @@
+{
+  "extract": "dir",
+  "path": "./test",
+  "savePath": "./",
+  "replace": false,
+  "regex": "/\\$\\$.*?\\$\\$/g"
+}

@@ -1,6 +1,6 @@
 {
   "name": "@chazy/text-extractor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "extract text with command line in any node.js project",
   "main": "index.js",
   "scripts": {
